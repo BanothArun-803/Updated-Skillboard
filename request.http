@@ -1,0 +1,42 @@
+### Register a new user
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Arun",
+  "email": "arun@example.com",
+  "password": "123456",
+  "role": "employee"
+}
+
+### Register Admin
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin",
+  "email": "admin@skillboard.com",
+  "password": "admin123",
+  "role": "admin"
+}
+
+### Login Admin for token generation
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@skillboard.com",
+  "password": "admin123"
+}
+
+### Assign Project to Employee
+POST http://localhost:5000/api/projects
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjVmNTQ1MTE0OTViMTZjZmI2NzBmMyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MTUyMjg3OH0.a1vYlhyPdpp14U3FyXy1Zdxo0PxxuPi2U-eTlc2JMs8
+
+{
+  "name": "Web Dashboard Project",
+  "description": "Build a dashboard for weekly AI team reports.",
+  "deadline": "2025-07-15",
+  "assignedTo": ["6865f4dd11495b16cfb670f1"]
+}

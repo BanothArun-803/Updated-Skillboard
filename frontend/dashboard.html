@@ -1,0 +1,172 @@
+<!-- File: frontend/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillBoard Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow p-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-blue-600">SkillBoard</h1>
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded">Logout</button>
+    </nav>
+
+    <!-- Dashboard Layout -->
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="w-64 h-screen bg-white shadow p-4 hidden md:block">
+            <h2 class="text-xl font-semibold mb-4">Menu</h2>
+            <ul class="space-y-2">
+                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Dashboard</a></li>
+                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Projects</a></li>
+                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Skills</a></li>
+                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Team</a></li>
+                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Performance</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <h2 class="text-2xl font-bold mb-4" id="dashboardTitle">Loading...</h2>
+            <div id="dashboardContent" class="space-y-6"></div>
+        </main>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+        const dashboardTitle = document.getElementById("dashboardTitle");
+        const dashboardContent = document.getElementById("dashboardContent");
+
+        async function loadDashboard() {
+            let endpoint = role === "admin" ? "admin" : role === "employee" ? "employee" : "client";
+
+            const res = await fetch(`http://localhost:5000/api/dashboard/${endpoint}`, {
+                headers: { Authorization: token }
+            });
+
+            const data = await res.json();
+            const user = data.user;
+            dashboardTitle.innerText = `Welcome, ${role.charAt(0).toUpperCase() + role.slice(1)}`;
+
+            dashboardContent.innerHTML = `
+        <div class="bg-white shadow p-6 rounded space-y-4">
+          <h3 class="text-xl font-semibold">👤 User Profile</h3>
+          <p><strong>👤 Name:</strong> ${user.name}</p>
+          <p><strong>📧 Email:</strong> ${user.email}</p>
+          <p><strong>🎯 Role:</strong> ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</p>
+
+          <div>
+            <p class="font-semibold">🛠️ Skills:</p>
+            <div id="skillList" class="space-y-2 mt-2">
+              ${renderSkills(user.skills)}
+            </div>
+            <div class="flex items-center space-x-2 mt-3">
+              <input type="text" id="newSkill" placeholder="Add new skill"
+                class="border p-2 rounded w-1/2" />
+              <button onclick="addSkill()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Add</button>
+            </div>
+            <p id="skillMsg" class="text-sm text-green-600 mt-1"></p>
+          </div>
+
+          <div>
+            <p class="font-semibold">📁 Assigned Projects:</p>
+            <div class="space-y-3 mt-2">
+              ${user.assignedProjects.length > 0
+                    ? user.assignedProjects.map(p => `
+                    <div class="bg-yellow-50 p-3 rounded border">
+                      <p class="font-semibold">${p.title || 'Untitled Project'}</p>
+                      <p class="text-sm text-gray-600">${p.description || 'No description'}</p>
+                     <p class="text-sm text-gray-500">
+        📅 Deadline: ${p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB') : 'Not set'}</p>
+
+                    </div>`).join("")
+                    : '<p class="text-gray-500">No projects assigned</p>'
+                }
+            </div>
+          </div>
+        </div>
+      `;
+        }
+
+        // function renderSkills(skills) {
+        //     if (!skills.length) return '<p class="text-gray-500">No skills added</p>';
+        //     return skills.map(skill => {
+        //         const percent = Math.min(skill.level * 20, 100);
+        //         return `
+        //   <div>
+        //     <div class="flex justify-between mb-1">
+        //       <span>${skill.name}</span>
+        //       <span class="text-sm text-gray-500">Level ${skill.level}</span>
+        //     </div>
+        //     <div class="w-full bg-gray-200 rounded-full h-3">
+        //       <div class="bg-blue-500 h-3 rounded-full" style="width: ${percent}%;"></div>
+        //     </div>
+        //   </div>
+        // `;
+        //     }).join('');
+        // }
+        function renderSkills(skills) {
+  if (!skills.length) return '<p class="text-gray-500">No skills added</p>';
+  return skills.map(skill => {
+    const percent = Math.min(skill.level * 20, 100);
+    return `
+      <div>
+        <div class="flex justify-between mb-1">
+          <span>${skill.name}</span>
+          <span class="text-sm text-gray-500">Level ${skill.level}</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+          <div class="bg-blue-500 h-3 rounded-full" style="width: ${percent}%;"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+
+        async function addSkill() {
+            const skillInput = document.getElementById("newSkill");
+            const skill = skillInput.value.trim();
+            if (!skill) return;
+
+            const res = await fetch("http://localhost:5000/api/dashboard/employee/skill", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: token
+                },
+                body: JSON.stringify({ skill })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById("skillList").innerHTML = renderSkills(data.skills);
+                document.getElementById("skillMsg").innerText = "✅ Skill added!";
+                skillInput.value = "";
+            } else {
+                document.getElementById("skillMsg").innerText = data.message || "Error adding skill.";
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "login.html";
+        }
+
+        loadDashboard();
+    </script>
+</body>
+
+</html>
+
+
+
+
+<!-- <p class="text-sm text-gray-500">📅 Deadline: ${p.deadline ? p.deadline.slice(0, 10) : 'Not set'}</p> -->
