@@ -23,11 +23,23 @@
         <aside class="w-64 h-screen bg-white shadow p-4 hidden md:block">
             <h2 class="text-xl font-semibold mb-4">Menu</h2>
             <ul class="space-y-2">
-                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Dashboard</a></li>
-                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Projects</a></li>
-                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Skills</a></li>
-                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Team</a></li>
-                <li><a href="#" class="block p-2 rounded hover:bg-gray-200">Performance</a></li>
+                <ul class="space-y-2">
+                    <li><a href="#"
+                            class="block p-2 rounded transition duration-200 hover:bg-blue-100 hover:text-blue-700 font-medium">Dashboard</a>
+                    </li>
+                    <li><a href="#"
+                            class="block p-2 rounded transition duration-200 hover:bg-blue-100 hover:text-blue-700 font-medium">Projects</a>
+                    </li>
+                    <li><a href="#"
+                            class="block p-2 rounded transition duration-200 hover:bg-blue-100 hover:text-blue-700 font-medium">Skills</a>
+                    </li>
+                    <li><a href="#"
+                            class="block p-2 rounded transition duration-200 hover:bg-blue-100 hover:text-blue-700 font-medium">Team</a>
+                    </li>
+                    <li><a href="#"
+                            class="block p-2 rounded transition duration-200 hover:bg-blue-100 hover:text-blue-700 font-medium">Performance</a>
+                    </li>
+                </ul>
             </ul>
         </aside>
 
@@ -80,7 +92,8 @@
             <div class="space-y-3 mt-2">
               ${user.assignedProjects.length > 0
                     ? user.assignedProjects.map(p => `
-                    <div class="bg-yellow-50 p-3 rounded border">
+                    <div class="bg-yellow-50 p-3 rounded border transition duration-200 hover:shadow-lg hover:border-yellow-400">
+
                       <p class="font-semibold">${p.title || 'Untitled Project'}</p>
                       <p class="text-sm text-gray-600">${p.description || 'No description'}</p>
                      <p class="text-sm text-gray-500">
@@ -94,29 +107,12 @@
         </div>
       `;
         }
-
-        // function renderSkills(skills) {
-        //     if (!skills.length) return '<p class="text-gray-500">No skills added</p>';
-        //     return skills.map(skill => {
-        //         const percent = Math.min(skill.level * 20, 100);
-        //         return `
-        //   <div>
-        //     <div class="flex justify-between mb-1">
-        //       <span>${skill.name}</span>
-        //       <span class="text-sm text-gray-500">Level ${skill.level}</span>
-        //     </div>
-        //     <div class="w-full bg-gray-200 rounded-full h-3">
-        //       <div class="bg-blue-500 h-3 rounded-full" style="width: ${percent}%;"></div>
-        //     </div>
-        //   </div>
-        // `;
-        //     }).join('');
-        // }
+        
         function renderSkills(skills) {
-  if (!skills.length) return '<p class="text-gray-500">No skills added</p>';
-  return skills.map(skill => {
-    const percent = Math.min(skill.level * 20, 100);
-    return `
+            if (!skills.length) return '<p class="text-gray-500">No skills added</p>';
+            return skills.map(skill => {
+                const percent = Math.min(skill.level * 20, 100);
+                return `
       <div>
         <div class="flex justify-between mb-1">
           <span>${skill.name}</span>
@@ -127,8 +123,8 @@
         </div>
       </div>
     `;
-  }).join('');
-}
+            }).join('');
+        }
 
 
         async function addSkill() {
@@ -165,8 +161,3 @@
 </body>
 
 </html>
-
-
-
-
-<!-- <p class="text-sm text-gray-500">📅 Deadline: ${p.deadline ? p.deadline.slice(0, 10) : 'Not set'}</p> -->
